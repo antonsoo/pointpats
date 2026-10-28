@@ -426,8 +426,9 @@ class _PoissonReturn:
         self.points = points
 
 
+@pytest.mark.parametrize("object_array", [False, True])
 def test_qstatistic_simulation_branch_calls_poisson_and_sets_outputs(
-    monkeypatch, window_poly
+    monkeypatch, window_poly, object_array
 ):
     # Make points fit inside the window for clarity
     pts = np.array([[1.0, 1.0], [2.0, 1.0], [3.0, 2.0], [4.0, 4.0]], dtype=float)
@@ -442,7 +443,8 @@ def test_qstatistic_simulation_branch_calls_poisson_and_sets_outputs(
         calls["rng_is_generator"] = isinstance(rng, np.random.Generator)
 
         # deterministic realizations: identical copies (chi2_sim == chi2_obs)
-        return [_PoissonReturn(pts.copy()) for _ in range(realizations)]
+        simulations = [_PoissonReturn(pts.copy()) for _ in range(realizations)]
+        return np.array(simulations, dtype=object) if object_array else simulations
 
     # Patch the imported poisson symbol in the module under test
     monkeypatch.setattr(m, "poisson", poisson_stub)
