@@ -100,6 +100,21 @@ def test_std_distance(points):
     np.testing.assert_allclose(std, 1.4142135623730951, RTOL)
 
 
+@pytest.mark.parametrize("dtype", [np.int32, np.int64, np.float32, np.float64])
+@pytest.mark.parametrize("input_type", ["array", "list", "geoseries"])
+def test_std_distance_projected_coordinates(dtype, input_type):
+    coords = np.array(
+        [[500000, 4500000], [500002, 4500002], [500004, 4500000]], dtype=dtype
+    )
+    if input_type == "list":
+        coords = coords.tolist()
+    elif input_type == "geoseries":
+        coords = gpd.GeoSeries.from_xy(*coords.T)
+
+    # Variances are 8/3 and 8/9, independent of the coordinate origin.
+    np.testing.assert_allclose(centrography.std_distance(coords), np.sqrt(32) / 3)
+
+
 @dispatch_types
 def test_euclidean_median(points):
     euclidean = centrography.euclidean_median(points)

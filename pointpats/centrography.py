@@ -580,9 +580,8 @@ def std_distance(points) -> np.float64:
 
 @std_distance.register
 def _(points: np.ndarray) -> np.float64:
-    n, _ = points.shape
-    m = points.mean(axis=0)
-    return np.sqrt(((points * points).sum(axis=0) / n - m * m).sum())
+    dtype = np.result_type(points.dtype, np.float64)
+    return np.sqrt(np.var(points, axis=0, dtype=dtype).sum())
 
 
 @std_distance.register
