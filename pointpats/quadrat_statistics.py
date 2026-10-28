@@ -656,6 +656,8 @@ class QStatistic:
             intensity = n / float(self.window.area)
 
             reals = poisson(self.window, intensity, realizations, rng=self.rng)
+            if isinstance(reals, np.ndarray):
+                reals = reals.reshape(realizations, -1, 2)
 
             chi2_realizations = []
             for i in range(realizations):

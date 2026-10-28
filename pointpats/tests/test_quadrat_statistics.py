@@ -406,6 +406,19 @@ def test_qstatistic_plot_invalid_show(pts_simple):
 # -----------------------------------------------------------------------------
 # QStatistic tests (simulation branch via poisson stub)
 # -----------------------------------------------------------------------------
+@pytest.mark.parametrize("shape", ["rectangle", "hexagon"])
+def test_qstatistic_single_realization(pts_simple, shape):
+    single = m.QStatistic(pts_simple, shape=shape, lh=1, realizations=1, rng=17)
+    multiple = m.QStatistic(pts_simple, shape=shape, lh=1, realizations=2, rng=17)
+
+    assert single.chi2_realizations.shape == (1,)
+    np.testing.assert_array_equal(
+        single.chi2_realizations, multiple.chi2_realizations[:1]
+    )
+    expected_pvalue = (1 + (single.chi2_realizations[0] >= single.chi2)) / 2
+    assert single.chi2_r_pvalue == expected_pvalue
+
+
 class _PoissonReturn:
     """Mimic an object with a `.points` attribute."""
 
